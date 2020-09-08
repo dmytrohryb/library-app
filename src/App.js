@@ -1,14 +1,46 @@
-import React, { Component } from "react";
+import React from 'react'
+import './styles/App.css'
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route
+} from "react-router-dom"
+import {About} from './pages/About'
+import {Home} from './pages/Home'
+import {Rules} from './pages/Rules'
+import {Catalog} from './pages/Catalog'
+import {Navigation} from './components/Navigation'
 
-import './styles/App.css';
+class App extends React.Component {
+    constructor(props){
+        super(props)
+        this.state = {
+            guestMode: true,
+            userMode: false,
+            adminMode: false
+        }
+    }
 
-class App extends Component {
-    render() {
+    render(){
         return (
-            <div>
-                <h1>My React App!</h1>
-            </div>
-        );
+            <Router>
+              <Navigation />
+              <Switch>
+                  <Route path="/about">
+                    <About />
+                  </Route>
+                  <Route path="/books">
+                    <Catalog />
+                  </Route>
+                  <Route path="/rules">
+                    <Rules />
+                  </Route>
+                  <Route path="/">
+                    <Home />
+                  </Route>
+                </Switch>
+            </Router>
+        )
     }
 }
 
