@@ -15,23 +15,25 @@ export class Navigation extends React.Component {
     constructor(props){
         super(props)
         this.state = {
-            user: undefined
+            user: null
         }
     }
+
+    
     
     render(){
         return (
             <Navbar bg="dark" variant="dark">
-                <Navbar.Brand><Link class="nav-link brand" to="/">Library app</Link></Navbar.Brand>
+                <Navbar.Brand><Link className="nav-link brand" to="/">Library app</Link></Navbar.Brand>
                     <Nav className="mr-auto">
-                        <Nav.Link><Link class="nav-link" to="/">Home</Link></Nav.Link>
-                        <Nav.Link><Link class="nav-link" to="/books">Catalog</Link></Nav.Link>
-                        <Nav.Link><Link class="nav-link" to="/rules">Rules</Link></Nav.Link>
-                        <Nav.Link><Link class="nav-link" to="/about">About</Link></Nav.Link>
+                        <Link className="nav-link" to="/">Home</Link>
+                        <Link className="nav-link" to="/books">Catalog</Link>
+                        <Link className="nav-link" to="/rules">Rules</Link>
+                        <Link className="nav-link" to="/about">About</Link>
                     </Nav>
                 <Form inline>
                     <Button variant="outline-warning" onClick={() => this.setState({signUpModal: true})}>Sign up</Button>
-                    <div class="margin14"/>
+                    <div className="margin14"/>
                     <Button variant="success" onClick={() => this.setState({signInModal: true})}>Sign in</Button>
                 </Form>
                 <SigninModal show={this.state.signInModal} closeModal={() => this.setState({signInModal: false})}/>
