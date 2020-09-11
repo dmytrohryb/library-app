@@ -1,6 +1,7 @@
 import React from 'react'
 import { Modal, Button, Form, Col, Spinner } from "react-bootstrap"
 import Axios from 'axios'
+const md5 = require('md5')
 
 export class SignupModal extends React.Component {
     
@@ -37,6 +38,7 @@ export class SignupModal extends React.Component {
         this.errorFooter = this.errorFooter.bind(this)
         
         this.changeScreen = this.changeScreen.bind(this)
+        this.closeModal = this.closeModal.bind(this)
         this.signUp = this.signUp.bind(this)
     }
 
@@ -53,7 +55,7 @@ export class SignupModal extends React.Component {
             Axios.post('http://localhost:4000/create-user', {
                     login: this.state.userData.login,
                     email: this.state.userData.email,
-                    password: this.state.userData.password,
+                    password: md5(this.state.userData.password),
                     phone: this.state.userData.phone,
                     gender: (this.state.userData.gender === 'Male') ? 1 : 2,
                     age: this.state.userData.age,
@@ -68,6 +70,11 @@ export class SignupModal extends React.Component {
                 setTimeout(() => this.changeScreen('errorScreen'), 1000)
             })
         }
+    }
+
+    closeModal(){
+        setTimeout(() => this.changeScreen(), 1000)
+        this.props.closeModal()
     }
 
     loginHandleChange(event){
@@ -142,7 +149,7 @@ export class SignupModal extends React.Component {
             break
             default:
                 this.setState({
-                    formScreen: false,
+                    formScreen: true,
                     loadingScreen: false,
                     successScreen: false,
                     errorScreen: false
@@ -203,7 +210,7 @@ export class SignupModal extends React.Component {
 
     formFooter(){
         return <>
-            <Button variant="secondary" onClick={() => this.props.closeModal()}>
+            <Button variant="secondary" onClick={() => this.closeModal()}>
                 Close
             </Button>
             <Button variant="success" onClick={() => this.signUp()}>
@@ -217,7 +224,7 @@ export class SignupModal extends React.Component {
             <Button variant="primary" onClick={() => this.changeScreen('formScreen')}>
                 Try again
             </Button>
-            <Button variant="secondary" onClick={() => this.props.closeModal()}>
+            <Button variant="secondary" onClick={() => this.closeModal()}>
                 Close
             </Button>
         </>
@@ -253,16 +260,15 @@ export class SignupModal extends React.Component {
         }else if(!this.state.formScreen && this.state.loadingScreen && !this.state.successScreen && !this.state.errorScreen){
             return 'Please wait'
         }else if(!this.state.formScreen && !this.state.loadingScreen && this.state.successScreen && !this.state.errorScreen){
-            return <Button variant="success" onClick={() => this.props.closeModal()}>Continue</Button>
+            return <Button variant="success" onClick={() => this.closeModal()}>Continue</Button>
         }else{
             return this.errorFooter()
         }
     }
 
     render(){
-        console.log(this.state)
         return(
-            <Modal show={this.props.show} onHide={() => this.props.closeModal()}>
+            <Modal show={this.props.show} onHide={() => this.closeModal()}>
                 <Modal.Header closeButton>
                     <Modal.Title>{this.getTitleScreen()}</Modal.Title>
                 </Modal.Header>

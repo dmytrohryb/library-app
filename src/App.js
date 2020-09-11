@@ -19,12 +19,41 @@ class App extends React.Component {
             userMode: false,
             adminMode: false
         }
+
+        this.changeMode = this.changeMode.bind(this)
+        this.getCurrentMode = this.getCurrentMode.bind(this)
+    }
+
+    changeMode(user){
+        console.log(user)
+        switch (user.role_id){
+            case 1:
+                this.setState({guestMode: false, userMode: false, adminMode: true})
+                break
+            case 2:
+                this.setState({guestMode: false, userMode: true, adminMode: false})
+                break
+            default:
+                this.setState({guestMode: true, userMode: false, adminMode: false})
+        }
+    }
+
+    getCurrentMode(){
+        if(this.state.guestMode){
+            return 'guest'
+        }
+        if(this.state.userMode){
+            return 'user'
+        }
+        if(this.state.adminMode){
+            return 'admin'
+        }
     }
 
     render(){
         return (
             <Router>
-              <Navigation />
+              <Navigation changeUser={this.changeMode} userMode={this.getCurrentMode()} />
               <Switch>
                   <Route path="/about">
                     <About />
