@@ -1,14 +1,15 @@
 import React from 'react'
 import {
-    Button, 
-    Nav, 
-    Navbar, 
+    Button,
+    Nav,
+    Navbar,
     Form
   } from 'react-bootstrap'
 import {Link} from "react-router-dom"
 import '../styles/Navigation.css'
 import {SigninModal} from './SigninModal'
 import {SignupModal} from './SignupModal'
+import {LogoutModal} from "./LogoutModal";
 
 export class Navigation extends React.Component {
 
@@ -26,6 +27,7 @@ export class Navigation extends React.Component {
     }
 
     changeUser(user){
+
         this.props.changeUser(user)
     }
 
@@ -48,8 +50,9 @@ export class Navigation extends React.Component {
                     <div className="margin14"/>
                     <Button variant="success" onClick={() => this.setState({signUpModal: true})}>My profile</Button>
                     <div className="margin14"/>
-                    <Button variant="outline-danger" onClick={() => this.setState({signInModal: true})}>Log out</Button>
+                    <Button variant="outline-danger" onClick={() => this.setState({logoutModal: true})}>Logout</Button>
                 </Form>
+                <LogoutModal show={this.state.logoutModal} changeUser={this.changeUser} closeModal={() => this.setState({logoutModal: false})}/>
             </>
         )
     }
@@ -58,10 +61,13 @@ export class Navigation extends React.Component {
         return (
             <>
                 <Form inline>
-                    <Button variant="warning" onClick={() => this.setState({signUpModal: true})}>My profile</Button>
+                    <div className="welcome-text">Welcome, {this.props.userData.login}</div>
                     <div className="margin14"/>
-                    <Button variant="outline-danger" onClick={() => this.setState({signInModal: true})}>Log out</Button>
+                    <Button variant="success" onClick={() => this.setState({signUpModal: true})}>My profile</Button>
+                    <div className="margin14"/>
+                    <Button variant="outline-danger" onClick={() => this.setState({logoutModal: true})}>Logout</Button>
                 </Form>
+                <LogoutModal show={this.state.logoutModal} changeUser={this.changeUser} closeModal={() => this.setState({logoutModal: false})}/>
             </>
         )
     }
@@ -70,9 +76,9 @@ export class Navigation extends React.Component {
         return (
             <>
                 <Form inline>
-                    <Button variant="outline-warning" onClick={() => this.setState({signUpModal: true})}>Sign up</Button>
+                    <Button variant="outline-warning" onClick={() => this.setState({signUpModal: true})}>Register</Button>
                     <div className="margin14"/>
-                    <Button variant="success" onClick={() => this.setState({signInModal: true})}>Sign in</Button>
+                    <Button variant="success" onClick={() => this.setState({signInModal: true})}>Login</Button>
                 </Form>
                 <SigninModal show={this.state.signInModal} changeUser={this.changeUser} closeModal={() => this.setState({signInModal: false})}/>
                 <SignupModal show={this.state.signUpModal} closeModal={() => this.setState({signUpModal: false})}/>

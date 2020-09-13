@@ -2,7 +2,7 @@ import React from 'react'
 import {Modal, Button, Form, Spinner} from "react-bootstrap"
 import Axios from "axios";
 const md5 = require('md5')
-
+import Cookies from 'js-cookie'
 export class SigninModal extends React.Component {
     
     constructor(props){
@@ -190,8 +190,10 @@ export class SigninModal extends React.Component {
                 password: md5(this.state.userData.password)
             }).then(res => {
                 if(res.data){
-                    this.setState({user: res.data})
+                    this.setState({user: res.data.userData})
+                    Cookies.set('session', res.data.token)
                     setTimeout(() => this.changeScreen('successScreen'), 1000)
+
                 }else{
                     setTimeout(() => this.changeScreen('errorScreen'), 1000)
                 }
@@ -203,8 +205,8 @@ export class SigninModal extends React.Component {
 
     render(){
         return(
-            <Modal show={this.props.show} onHide={(this.state.success) ? () => this.continue() :() => this.closeModal()}>
-                <Modal.Header closeButton>
+            <Modal show={this.props.show} onHide={() => {}}>
+                <Modal.Header >
                     <Modal.Title>{this.getTitleScreen()}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>

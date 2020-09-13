@@ -268,8 +268,8 @@ export class SignupModal extends React.Component {
 
     render(){
         return(
-            <Modal show={this.props.show} onHide={() => this.closeModal()}>
-                <Modal.Header closeButton>
+            <Modal show={this.props.show} onHide={() => {}}>
+                <Modal.Header >
                     <Modal.Title>{this.getTitleScreen()}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
