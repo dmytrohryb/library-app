@@ -10,6 +10,7 @@ import '../styles/Navigation.css'
 import {SigninModal} from './SigninModal'
 import {SignupModal} from './SignupModal'
 import {LogoutModal} from "./LogoutModal";
+import {NavigationButton} from "./base/NavigationButton";
 
 export class Navigation extends React.Component {
 
@@ -76,9 +77,11 @@ export class Navigation extends React.Component {
         return (
             <>
                 <Form inline>
-                    <Button variant="outline-warning" onClick={() => this.setState({signUpModal: true})}>Register</Button>
+
+
+                    <NavigationButton name='Register' onPress={() => this.setState({signUpModal: true})}/>
                     <div className="margin14"/>
-                    <Button variant="success" onClick={() => this.setState({signInModal: true})}>Login</Button>
+                    <NavigationButton name='Login' onPress={() => this.setState({signInModal: true})}/>
                 </Form>
                 <SigninModal show={this.state.signInModal} changeUser={this.changeUser} closeModal={() => this.setState({signInModal: false})}/>
                 <SignupModal show={this.state.signUpModal} closeModal={() => this.setState({signUpModal: false})}/>
@@ -91,10 +94,12 @@ export class Navigation extends React.Component {
             <Navbar bg="dark" variant="dark">
                 <Navbar.Brand><Link className="nav-link brand" to="/">Library app</Link></Navbar.Brand>
                     <Nav className="mr-auto">
-                        <Link className="nav-link" to="/">Home</Link>
+                        <Link className="nav-link" to="/">News</Link>
                         <Link className="nav-link" to="/books">Catalog</Link>
                         <Link className="nav-link" to="/rules">Rules</Link>
                         <Link className="nav-link" to="/about">About</Link>
+                        <Link className="nav-link" to="/about">Top readers</Link>
+                        <Link className="nav-link" to="/about">Top authors</Link>
                     </Nav>
                 {this.changeMode()}
             </Navbar>

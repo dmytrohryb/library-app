@@ -85,7 +85,7 @@ class App extends React.Component {
                     <Rules />
                   </Route>
                   <Route path="/">
-                    <Home />
+                    <Catalog />
                   </Route>
                 </Switch>
             </Router>
