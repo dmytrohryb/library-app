@@ -5,7 +5,7 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
-import Link from '@material-ui/core/Link';
+import {Redirect, Link} from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
@@ -14,9 +14,8 @@ import Container from '@material-ui/core/Container';
 import CircularProgress from "@material-ui/core/CircularProgress";
 const md5 = require('md5')
 import Axios from "axios";
-import {changeUser} from "../../store/PersonalBlock/actions";
-import {connect} from "react-redux";
-import {Alert, AlertTitle} from "@material-ui/lab";
+import Cookies from 'js-cookie'
+import openSocket from 'socket.io-client';
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -38,12 +37,13 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-function SignIn(props) {
+export function SignIn(props) {
     const classes = useStyles()
     const [email, setEmail] = React.useState('')
     const [password, setPassword] = React.useState('')
     const [loaded, setLoaded] = React.useState(true)
-    const [error, setError] = React.useState(false)
+    const [loading, setLoading] = React.useState(false)
+    const [success, setSuccess] = React.useState(false)
 
     function changeEmail(e){
         setEmail(e.target.value)
@@ -58,23 +58,38 @@ function SignIn(props) {
     function createSession(){
         if(validateUserData()){
             setLoaded(false)
-            Axios.post('http://localhost:4000/create-user', {
+            setLoading(true)
+            setSuccess(false)
+            Axios.post('http://localhost:4000/create-session', {
                 email: email,
                 password: md5(password)
             }).then(res => {
                 if(res.data){
-                    setTimeout(() => setLoaded(true), 1000)
-                    props.changeUser('user')
+                    setTimeout(() => {
+                        setLoaded(false)
+                        setLoading(false)
+                        setSuccess(true)
+                        props.showAlert('success', 'Авторизация прошла успешно, добро пожаловать!')
+                    }, 1000)
+                    Cookies.set('token', res.data.token)
+                    openSocket('http://localhost:8000', {query: {
+                            token: res.data.token
+                        }})
+                    props.changeUser(res.data.userData)
                 }else{
                     setTimeout(() => {
                         setLoaded(true)
-                        setError(true)
+                        setLoading(false)
+                        setSuccess(false)
+                        props.showAlert('error', 'Неверный email или пароль')
                     }, 1000)
                 }
             }).catch(err => {
                 setTimeout(() => {
                     setLoaded(true)
-                    setError(true)
+                    setLoading(false)
+                    setSuccess(false)
+                    props.showAlert('error', 'Ошибка соединения с сервером! Попробуте позже.')
                 }, 1000)
             })
         }
@@ -85,35 +100,6 @@ function SignIn(props) {
         if(!password) return false
         return true
     }
-
-    const Error = (
-        <Grid
-            container
-            direction="column"
-            justify="center"
-            alignItems="center"
-        >
-
-                <Alert severity="error">
-                    <AlertTitle>Error</AlertTitle>
-                    This is an error alert — <strong>check it out!</strong>
-                </Alert>
-
-                <Button
-                    type="button"
-                    variant="contained"
-                    color="primary"
-                    className={classes.submit}
-                    onClick={e => {
-                        setLoaded(Boolean(e))
-                        setError(!Boolean(e))
-                    }}
-                >
-                    Try again
-                </Button>
-
-        </Grid>
-    )
 
     const Loading = (
         <Grid
@@ -127,7 +113,7 @@ function SignIn(props) {
         </Grid>
     )
 
-    const Loaded = (<>
+    const FormAithorization = (<>
         <TextField
             variant="outlined"
             margin="normal"
@@ -168,12 +154,12 @@ function SignIn(props) {
         </Button>
         <Grid container>
             <Grid item xs>
-                <Link href="#" variant="body2">
+                <Link to="/">
                     Forgot password?
                 </Link>
             </Grid>
             <Grid item>
-                <Link href="#" variant="body2">
+                <Link to='/sign-up'>
                     {"Don't have an account? Sign Up"}
                 </Link>
             </Grid>
@@ -192,21 +178,11 @@ function SignIn(props) {
                     Sign in
                 </Typography>
                 <form className={classes.form} noValidate>
-                    {(!error) ? (loaded) ? Loaded : Loading : Error}
+                    {(loading && !loaded && !success) ? Loading : (loaded && !loading && !success) ? FormAithorization : <Redirect to='/' /> }
                 </form>
             </div>
         </Container>
     );
 }
 
-const mapStateToProps = state => {
-    return {
-        user: state.personalBlock.user
-    }
-}
 
-const mapDispatchToProps = {
-    changeUser
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(SignIn)

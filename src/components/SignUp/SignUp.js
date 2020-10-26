@@ -5,7 +5,6 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
-import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
@@ -14,10 +13,7 @@ import Container from '@material-ui/core/Container';
 import Axios from 'axios'
 const md5 = require('md5')
 import CircularProgress from '@material-ui/core/CircularProgress';
-import { Alert, AlertTitle } from '@material-ui/lab';
-import {Redirect} from 'react-router-dom';
-import Snackbar from '@material-ui/core/Snackbar';
-import MuiAlert from '@material-ui/lab/Alert';
+import {Redirect, Link} from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -39,60 +35,71 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export function SignUp() {
+export function SignUp(props) {
     const classes = useStyles();
 
     const [email, setEmail] = React.useState('')
     const [password, setPassword] = React.useState('')
     const [name, setName] = React.useState('')
     const [surname, setSurname] = React.useState('')
-    const [login, setLogin] = React.useState('')
     const [success, setSuccess] = React.useState(false)
     const [loading, setLoading] = React.useState(false)
-    const [error, setError] = React.useState(false)
     const [confirmation, setConfirmation] = React.useState(false)
     const [confirmationCode, setConfirmationCode] = React.useState('')
-    const [open, setOpen] = React.useState(false)
+
 
     function createUser(){
-        if(validateUserData()){
-            setLoading(true)
-            setConfirmation(false)
-            setSuccess(false)
-            setError(false)
-            Axios.post('http://localhost:4000/create-user', {
-                login: login,
-                email: email,
-                password: md5(password),
-                name: name,
-                surname: surname,
-                gender_id: 1,
-                role_id: 1
-            }).then(res => {
-                if(res.data){
-                    setTimeout(() => {
-                        setLoading(false)
-                        setConfirmation(true)
-                        setSuccess(false)
-                        setError(false)
-                    }, 1000)
+            if(validateUserData()){
+                if(/@/.test(email)){
+                setLoading(true)
+                setConfirmation(false)
+                setSuccess(false)
+
+                    Axios.post('http://localhost:4000/create-user', {
+                        email: email,
+                        password: md5(password),
+                        name: name,
+                        surname: surname,
+                        role_id: 2
+                    }).then(res => {
+                        if(res.data === true){
+                            setTimeout(() => props.showAlert('success', 'Письмо с кодом подтверждения отправлено по адресу ' + email), 2000)
+                            setTimeout(() => {
+                                setLoading(false)
+                                setConfirmation(true)
+                                setSuccess(false)
+                            }, 1500)
+                        }else{
+                            if(res.data === 'email exists'){
+                                setTimeout(() => props.showAlert('error', 'This email already exists!'), 2000)
+                                setTimeout(() => {
+                                    setLoading(false)
+                                    setConfirmation(false)
+                                    setSuccess(false)
+                                }, 1500)
+                            }else{
+                                setTimeout(() => props.showAlert('error', 'Ошибка подтверждения почтового адреса! Возможно вы указали несуществующий адрес, убедитесь что указан верный адрес и попробуте снова.'), 2000)
+                                setTimeout(() => {
+                                    setLoading(false)
+                                    setConfirmation(false)
+                                    setSuccess(false)
+                                }, 1500)
+                            }
+
+                        }
+                    }).catch(err => {
+                        setTimeout(() => props.showAlert('error', 'нет соединения с сервером'), 2000)
+                        setTimeout(() => {
+                            setLoading(false)
+                            setConfirmation(false)
+                            setSuccess(false)
+                        }, 1500)
+                    })
                 }else{
-                    setTimeout(() => {
-                        setLoading(false)
-                        setConfirmation(false)
-                        setSuccess(false)
-                        setError(true)
-                    }, 1000)
+                    props.showAlert('error', 'Некорректный email адрес!')
                 }
-            }).catch(err => {
-                setTimeout(() => {
-                    setLoading(false)
-                    setConfirmation(false)
-                    setSuccess(false)
-                    setError(true)
-                }, 1000)
-            })
-        }
+            }
+
     }
 
     function validateUserData(){
@@ -100,7 +107,6 @@ export function SignUp() {
         if(!password) return false
         if(!name) return false
         if(!surname) return false
-        if(!login) return false
         return true
     }
 
@@ -109,9 +115,7 @@ export function SignUp() {
             setLoading(true)
             setConfirmation(false)
             setSuccess(false)
-            setError(false)
             Axios.post('http://localhost:4000/confirmation-email', {
-                login: login,
                 email: email,
                 password: md5(password),
                 name: name,
@@ -121,38 +125,33 @@ export function SignUp() {
                 code: confirmationCode
             }).then(res => {
                 if(res.data === true){
-                    setOpen(true)
+                    setTimeout(() => props.showAlert('success', 'Email confirmed, account created!'), 2000)
                     setTimeout(() => {
                         setLoading(false)
                         setConfirmation(false)
                         setSuccess(true)
-                        setError(false)
-                    }, 1000)
+                    }, 1500)
                 }else{
+                    setTimeout(() => props.showAlert('error', 'Invalid confirmation code'), 2000)
                     setTimeout(() => {
                         setLoading(false)
-                        setConfirmation(false)
+                        setConfirmation(true)
                         setSuccess(false)
-                        setError(true)
-                    }, 1000)
+                    }, 1500)
                 }
             }).catch(err => {
+                setTimeout(() => props.showAlert('error', 'нет соединения с сервером'), 2000)
                 setTimeout(() => {
                     setLoading(false)
                     setConfirmation(false)
                     setSuccess(false)
-                    setError(true)
-                }, 1000)
+                }, 1500)
             })
         }
     }
 
     function changeEmail(e){
         setEmail(e.target.value)
-    }
-
-    function changeLogin(e){
-        setLogin(e.target.value)
     }
 
     function changePassword(e){
@@ -170,37 +169,6 @@ export function SignUp() {
     function changeConfirmationCode(e){
         setConfirmationCode(e.target.value)
     }
-
-    const ErrorScreen = (
-        <Grid
-            container
-            direction="column"
-            justify="center"
-            alignItems="center"
-        >
-
-                <Alert severity="error">
-                    <AlertTitle>Error</AlertTitle>
-                    This is an error alert — <strong>check it out!</strong>
-                </Alert>
-
-                <Button
-                    type="button"
-                    variant="contained"
-                    color="primary"
-                    className={classes.submit}
-                    onClick={e => {
-                        setLoading(false)
-                        setConfirmation(false)
-                        setSuccess(false)
-                        setError(false)
-                    }}
-                >
-                    Try again
-                </Button>
-
-        </Grid>
-    )
 
     const LoadingScreen = (
         <Grid
@@ -249,18 +217,6 @@ export function SignUp() {
 
     const FormRegistration = (<>
             <Grid container spacing={2}>
-                <Grid item xs={12}>
-                    <TextField
-                        variant="outlined"
-                        required
-                        fullWidth
-                        id="text"
-                        label="Login"
-                        name="login"
-                        autoComplete="text"
-                        onChange={changeLogin}
-                    />
-                </Grid>
                 <Grid item xs={12} sm={6}>
                     <TextField
                         autoComplete="fname"
@@ -330,7 +286,7 @@ export function SignUp() {
             </Button>
             <Grid container justify="flex-end">
                 <Grid item>
-                    <Link href="#" variant="body2">
+                    <Link to="/sign-in">
                         Already have an account? Sign in
                     </Link>
                 </Grid>
@@ -349,14 +305,10 @@ export function SignUp() {
                     Sign up
                 </Typography>
                 <form className={classes.form} noValidate>
-                    {(error) ? ErrorScreen : (loading) ? LoadingScreen : (confirmation) ? FormConfirmationEmail : (success) ? <Redirect to='/sign-in' /> : FormRegistration}
+                    {(loading) ? LoadingScreen : (confirmation) ? FormConfirmationEmail : (success) ? <Redirect to='/sign-in' /> : FormRegistration}
                 </form>
             </div>
-            <Snackbar open={open} autoHideDuration={6000} onClose={() => setOpen(false)}>
-                <Alert onClose={() => setOpen(false)} severity="success">
-                    This is a success message!
-                </Alert>
-            </Snackbar>
+
         </Container>
     )
 }

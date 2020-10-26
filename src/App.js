@@ -15,19 +15,39 @@ import {theme} from "./assets/theme";
 import {createStore} from "redux";
 import rootReducer from './store/reducers'
 import {Provider} from 'react-redux'
-import SignIn from "./components/SignIn/SignIn";
+import SignIn from "./containers/SignInContainer";
 import {SignUp} from "./components/SignUp/SignUp";
-import {Home} from './routes/Home'
+import Home from './containers/HomeRouteContainer'
 import {News} from "./routes/News";
 import {Catalog} from "./routes/Catalog";
 import {About} from "./routes/About";
 const store = createStore(rootReducer)
+import {Alert} from "@material-ui/lab";
+import Snackbar from "@material-ui/core/Snackbar";
 
 class App extends React.Component {
 
     constructor(props) {
         super(props);
+        this.state = {
+            alert: {
+                open: false,
+                type: 'success',
+                text: ''
+            }
+        }
 
+        this.showAlert = this.showAlert.bind(this)
+        this.hideAlert = this.hideAlert.bind(this)
+    }
+
+    showAlert(type, text){
+        this.hideAlert()
+        this.setState({alert: {open: true, type: type, text: text}})
+    }
+
+    hideAlert(){
+        this.setState({alert: {open: false, type: '', text: ''}})
     }
 
     render() {
@@ -44,7 +64,7 @@ class App extends React.Component {
                         <Grid container spacing={3}>
 
                             <Grid item xs={12}>
-                                <Header />
+                                <Header showAlert={this.showAlert} />
                             </Grid>
 
                             <Grid item xs={12}>
@@ -62,14 +82,21 @@ class App extends React.Component {
                                         <About />
                                     </Route>
                                     <Route path="/sign-in">
-                                        <SignIn />
+                                        <SignIn showAlert={this.showAlert}/>
                                     </Route>
                                     <Route path="/sign-up">
-                                        <SignUp />
+                                        <SignUp showAlert={this.showAlert}/>
                                     </Route>
                                 </Switch>
                                 <MainView />
                             </Grid>
+
+
+                            <Snackbar open={this.state.alert.open} autoHideDuration={6000} onClose={() => this.hideAlert()}>
+                                <Alert onClose={() => this.hideAlert()} severity={this.state.alert.type}>
+                                    {this.state.alert.text}
+                                </Alert>
+                            </Snackbar>
 
                         </Grid>
                         <footer style={{marginTop: 'auto'}}>

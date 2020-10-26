@@ -36,7 +36,7 @@ export class PersonalBlock extends React.Component {
                     <NotificationsIcon />
                 </Badge>
             </IconButton>
-            <ProfileMenu />
+            <ProfileMenu showAlert={this.props.showAlert} changeUser={this.props.changeUser} />
             </>
     }
 

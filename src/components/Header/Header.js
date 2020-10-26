@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export function Header(){
+export function Header(props){
     const classes = useStyles();
 
     return (
@@ -28,7 +28,7 @@ export function Header(){
                     <Typography variant="h6" className={classes.title}>
                         <NavigationMenu />
                     </Typography>
-                    <PersonalBlockContainer />
+                    <PersonalBlockContainer showAlert={props.showAlert} />
                 </Toolbar>
             </AppBar>
         </div>

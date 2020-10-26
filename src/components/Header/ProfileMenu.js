@@ -3,6 +3,8 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import IconButton from "@material-ui/core/IconButton";
+import Axios from "axios";
+import Cookies from 'js-cookie'
 
 export class ProfileMenu extends React.Component {
 
@@ -14,6 +16,7 @@ export class ProfileMenu extends React.Component {
 
         this.handleOpenMenu = this.handleOpenMenu.bind(this)
         this.handleCloseMenu = this.handleCloseMenu.bind(this)
+        this.handleLogout = this.handleLogout.bind(this)
     }
 
     handleOpenMenu (event) {
@@ -23,6 +26,21 @@ export class ProfileMenu extends React.Component {
     handleCloseMenu () {
         this.setState({anchorEl: null});
     };
+
+    handleLogout(){
+        Axios.post('http://localhost:4000/close-session', {
+            token: Cookies.get('token')
+        }).then(res => {
+            if(res) {
+                Cookies.remove('token')
+                this.props.changeUser(null)
+                this.props.showAlert('success', 'Сессия успешно завершена!')
+            }
+            else this.props.showAlert('error', 'Произошла ошибка, попробуйте позже!')
+        }).catch(err => {
+            this.props.showAlert('error', 'Нет соединения с сервером! Попробуйте позже!')
+        })
+    }
 
     render() {
         return (
@@ -48,7 +66,7 @@ export class ProfileMenu extends React.Component {
                     <MenuItem onClick={this.handleCloseMenu}>Profile</MenuItem>
                     <MenuItem onClick={this.handleCloseMenu}>My orders</MenuItem>
                     <MenuItem onClick={this.handleCloseMenu}>Settings</MenuItem>
-                    <MenuItem onClick={this.handleCloseMenu}>Logout</MenuItem>
+                    <MenuItem onClick={this.handleLogout}>Logout</MenuItem>
                 </Menu>
             </>
         );

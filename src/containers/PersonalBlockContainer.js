@@ -9,7 +9,7 @@ class PersonalBlockContainer extends React.Component {
     }
 
     render() {
-        return <PersonalBlock user={this.props.user} changeUser={this.props.changeUser} />
+        return <PersonalBlock showAlert={this.props.showAlert} user={this.props.user} changeUser={this.props.changeUser} />
     }
 }
 
